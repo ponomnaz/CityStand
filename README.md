@@ -4,18 +4,18 @@
 
 ## Установка (один раз)
 
-Нужны git, Python 3.10+ и 1 ГБ на диске.
+Нужны git, Python 3.10+, 1 ГБ оперативной памяти и 500 МБ на диске.
 
 ```bash
 git clone https://github.com/ponomnaz/CityStand.git
 cd CityStand
 python3 -m venv .venv
 .venv/bin/pip install -r requirements.txt
-.venv/bin/python download.py   # скачать данные GeoNames, 219 МБ
+.venv/bin/python download.py   # скачать данные GeoNames, 219 МБ; оборвалось — запустить снова, докачает
 .venv/bin/python build_db.py   # собрать из них справочник, около минуты
 ```
 
-Если `python3 -m venv` пишет про `ensurepip`, установите `sudo apt install python3-venv` и повторите.
+Если `python3 -m venv` ругается на `ensurepip` (так бывает на чистой Ubuntu), выполните `sudo apt install python3-venv` и повторите команду.
 
 ## Запуск
 
