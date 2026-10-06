@@ -1,0 +1,403 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Город отеля · демо</title>
+<style>
+  :root {
+    --bg: #f6f6f3; --panel: #fff; --text: #1d1d1b; --muted: #6b6a64; --line: #e2e1db;
+    --accent: #2563eb; --accent-soft: #e9f0ff; --warn: #a45a00; --warn-soft: #fff1dc; --ok: #1f7a3a; --danger: #b42318;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root { --bg: #151514; --panel: #1e1e1c; --text: #ecebe6; --muted: #a2a19a; --line: #33322e;
+            --accent: #7ea6ff; --accent-soft: #1c2945; --warn: #f2b45c; --warn-soft: #3a2b12; --ok: #6fcf8a; --danger: #ff8a80; }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; font: 15px/1.45 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; background: var(--bg); color: var(--text); }
+  header { padding: 18px 24px 4px; }
+  h1 { font-size: 20px; margin: 0; }
+  h2 { font-size: 20px; margin: 0 0 2px; }
+  h3 { font-size: 14px; margin: 0 0 8px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+  .muted { color: var(--muted); font-size: 13px; }
+  .small { font-size: 12px; }
+  main { display: grid; grid-template-columns: minmax(300px, 400px) 1fr; gap: 16px; padding: 12px 24px 24px; align-items: start; }
+  @media (max-width: 820px) { main { grid-template-columns: 1fr; } }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; }
+  .panel + .panel { margin-top: 16px; }
+  input, button, select { font: inherit; color: var(--text); }
+  input[type=text] { width: 100%; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+  input[type=text]:focus { outline: 2px solid var(--accent); outline-offset: -1px; }
+  select { padding: 4px 6px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel); font-size: 13.5px; }
+  button { padding: 7px 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); cursor: pointer; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+  button.danger { color: var(--danger); }
+  button.icon { padding: 2px 8px; font-size: 13px; }
+  .search { position: relative; }
+  #suggest { position: absolute; z-index: 5; left: 0; right: 0; top: calc(100% + 4px); margin: 0; padding: 4px 0; list-style: none;
+             background: var(--panel); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.12); }
+  #suggest:empty { display: none; }
+  #suggest li { padding: 7px 12px; cursor: pointer; }
+  #suggest li.active { background: var(--accent-soft); }
+  .list { list-style: none; margin: 0; padding: 0; }
+  .list li { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 0;
+             border-top: 1px solid var(--line); cursor: pointer; }
+  .list li:first-child { border-top: 0; }
+  .tag { display: inline-block; padding: 0 7px; border-radius: 999px; font-size: 12px; line-height: 1.7; white-space: nowrap; }
+  .tag.gn { background: var(--accent-soft); color: var(--accent); }
+  .tag.warn { background: var(--warn-soft); color: var(--warn); }
+  .tag.manual { background: transparent; border: 1px solid var(--ok); color: var(--ok); }
+  .tag.main { background: transparent; border: 1px solid var(--accent); color: var(--accent); }
+  table { width: 100%; border-collapse: collapse; margin-top: 12px; }
+  th, td { text-align: left; padding: 5px 8px 5px 0; border-bottom: 1px solid var(--line); vertical-align: middle; }
+  th { font-weight: 400; color: var(--muted); font-size: 13px; }
+  tr.group th { padding-top: 14px; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; }
+  tr.main td:first-child { font-weight: 600; }
+  tr.main + tr.group th { border-top: 2px solid var(--line); }
+  tr.review td { background: var(--warn-soft); }
+  td input[type=text] { padding: 5px 8px; }
+  .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .chains { list-style: none; margin: 6px 0 0; padding: 0; }
+  .chains li { padding: 3px 0; }
+  .chains .end, .terminal .end { padding: 0 6px; border: 1px solid var(--line); border-radius: 6px; color: var(--muted); }
+  .terminal { margin: 8px 0 4px; font-size: 13px; color: var(--muted); }
+  table.langs td { padding: 4px 6px 4px 0; }
+  table.langs td:nth-child(2) { white-space: nowrap; }
+  pre { background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px; font-size: 12.5px; overflow: auto; max-height: 360px; }
+  .status { margin-top: 10px; font-size: 13px; }
+  .error { color: var(--danger); }
+  footer { padding: 0 24px 24px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Город отеля <span class="muted">· демо-стенд</span></h1>
+  <div class="muted" id="meta">&nbsp;</div>
+</header>
+<main>
+  <div>
+    <section class="panel">
+      <h3>Найти город</h3>
+      <div class="search">
+        <input id="q" type="text" placeholder="Начните вводить: Соч, Ереван, München…" autocomplete="off" autofocus
+               role="combobox" aria-expanded="false" aria-controls="suggest">
+        <ul id="suggest" role="listbox"></ul>
+      </div>
+    </section>
+    <section class="panel">
+      <h3>Сохранённые города</h3>
+      <ul class="list" id="cities"></ul>
+    </section>
+    <section class="panel">
+      <h3>Языки (конфиг сервера)</h3>
+      <div class="muted">Цепочки запасных языков: если названия на языке нет, оно берётся у следующего в цепочке.</div>
+      <ul class="chains" id="chains"></ul>
+      <div class="terminal" id="terminal"></div>
+      <table class="langs"><tbody id="lang-rows"></tbody></table>
+      <form id="add-lang" class="row" style="margin-top: 10px">
+        <input id="lang-code" type="text" placeholder="код: pl" style="width: 100px">
+        <label class="muted">запасной <select id="lang-fallback" aria-label="Запасной язык"></select></label>
+        <button type="submit">Добавить язык</button>
+      </form>
+      <div class="status muted" id="lang-status"></div>
+    </section>
+  </div>
+  <section class="panel" id="card">
+    <div class="muted">Найдите город слева и выберите его из подсказок.</div>
+  </section>
+</main>
+<footer class="muted">Данные о городах: <a href="https://www.geonames.org/" target="_blank" rel="noopener">GeoNames</a>, лицензия CC BY 4.0.</footer>
+
+<script>
+const $ = (s) => document.querySelector(s);
+const qInput = $('#q'), suggestBox = $('#suggest'), card = $('#card');
+const nf = new Intl.NumberFormat('ru-RU');
+const langNames = new Intl.DisplayNames(['ru'], { type: 'language' });
+let items = [], active = -1, timer = null, controller = null, current = null, langs = null;
+
+const esc = (v) => String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+const langName = (code) => { try { return langNames.of(code); } catch { return code; } };
+const place = (p) => [p.region, p.country].filter(Boolean).join(', ');
+
+async function api(url, options = {}) {
+  const res = await fetch(url, { headers: { 'Content-Type': 'application/json' }, ...options });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(typeof body.detail === 'string' ? body.detail : `HTTP ${res.status}`);
+  return body;
+}
+
+// Источник названия → метка
+function sourceTag(source, review) {
+  if (source === 'manual') return '<span class="tag manual">вручную</span>';
+  if (source === 'geonames') return '<span class="tag gn">GeoNames</span>';
+  if (source.startsWith('geonames:')) {
+    return `<span class="tag gn" title="Код ${esc(source.split(':')[1])} в GeoNames не говорит, упрощённое это письмо или традиционное">GeoNames, код ${esc(source.split(':')[1])}</span>`;
+  }
+  const hint = source === 'latin' ? 'нет перевода — латиница' : `нет перевода — взято: ${source.split(':')[1]}`;
+  return `<span class="tag warn" title="${review ? 'Подставлено автоматически, проверьте' : ''}">${esc(hint)}</span>`;
+}
+
+// ---- подсказки при вводе
+qInput.addEventListener('input', () => {
+  clearTimeout(timer);
+  timer = setTimeout(loadSuggestions, 150);
+});
+qInput.addEventListener('keydown', (e) => {
+  if (!items.length) return;
+  if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+    e.preventDefault();
+    active = (active + (e.key === 'ArrowDown' ? 1 : -1) + items.length) % items.length;
+    renderSuggestions();
+  } else if (e.key === 'Enter') {
+    e.preventDefault();
+    choose(items[Math.max(active, 0)]);
+  } else if (e.key === 'Escape') {
+    closeSuggestions();
+  }
+});
+qInput.addEventListener('blur', () => setTimeout(closeSuggestions, 150));
+
+async function loadSuggestions() {
+  const q = qInput.value.trim();
+  controller?.abort();
+  if (q.length < 2) return closeSuggestions();
+  controller = new AbortController();
+  try {
+    items = await api(`/api/suggest?q=${encodeURIComponent(q)}`, { signal: controller.signal });
+    active = items.length ? 0 : -1;
+    renderSuggestions();
+  } catch (e) {
+    if (e.name !== 'AbortError') suggestBox.innerHTML = `<li class="error">${esc(e.message)}</li>`;
+  }
+}
+
+function renderSuggestions() {
+  qInput.setAttribute('aria-expanded', items.length ? 'true' : 'false');
+  const same = {};
+  for (const it of items) same[it.name] = (same[it.name] || 0) + 1;
+  suggestBox.innerHTML = items.length ? items.map((it, i) => `
+    <li role="option" data-i="${i}" class="${i === active ? 'active' : ''}">
+      <b>${esc(it.name)}</b>${it.saved ? ' <span class="tag manual">сохранён</span>' : ''}
+      <div class="muted">${esc(place(it))}${it.population ? ` · ${nf.format(it.population)} жит.` : ''}${same[it.name] > 1 ? ' · есть тёзки' : ''}</div>
+    </li>`).join('') : '<li class="muted">Ничего не найдено</li>';
+}
+
+function closeSuggestions() {
+  items = [];
+  active = -1;
+  suggestBox.innerHTML = '';
+  qInput.setAttribute('aria-expanded', 'false');
+}
+
+suggestBox.addEventListener('mousedown', (e) => {
+  const li = e.target.closest('li[data-i]');
+  if (li) choose(items[Number(li.dataset.i)]);
+});
+
+function choose(item) {
+  if (!item) return;
+  qInput.value = item.name;
+  closeSuggestions();
+  openCity(item.geonameid);
+}
+
+// ---- карточка города
+async function openCity(id) {
+  history.replaceState(null, '', `?city=${id}`);  // ссылкой на город можно поделиться
+  card.innerHTML = '<div class="muted">Загружаю…</div>';
+  try {
+    current = await api(`/api/place/${id}`);
+    renderCard();
+  } catch (e) {
+    card.innerHTML = `<div class="error">${esc(e.message)}</div>`;
+  }
+}
+
+function langRow(l) {
+  return `<tr class="${l.main ? 'main' : ''} ${l.review ? 'review' : ''}" data-code="${esc(l.code)}">
+      <td>${esc(langName(l.code))} <span class="muted">${esc(l.code)}</span></td>
+      <td><input type="text" value="${esc(l.value)}" aria-label="${esc(langName(l.code))}"></td>
+      <td class="src">${sourceTag(l.source, l.review)}${l.review ? ' <span class="muted">проверьте</span>' : ''}</td>
+      <td>${l.value !== l.suggested.value ? `<button class="icon" type="button" data-reset title="Вернуть: ${esc(l.suggested.value)}">↺</button>` : ''}</td>
+    </tr>`;
+}
+
+function renderCard(clientJson = null, message = '') {
+  const c = current;
+  const main = c.languages.filter((l) => l.main), rest = c.languages.filter((l) => !l.main);
+  card.innerHTML = `
+    <h2>${esc(c.name)}</h2>
+    <div class="muted">${esc(place(c))}${c.population ? ` · ${nf.format(c.population)} жит.` : ''}</div>
+    <div class="row" style="margin-top: 8px">
+      <span>Координаты: <code>${c.lat.toFixed(5)}, ${c.lon.toFixed(5)}</code></span>
+      <a class="muted" href="https://www.geonames.org/${c.geonameid}" target="_blank" rel="noopener">GeoNames ${c.geonameid}</a>
+      <span class="muted">${c.saved_at ? `сохранён ${new Date(c.saved_at).toLocaleString('ru-RU')}` : 'ещё не сохранён'}</span>
+    </div>
+    <table>
+      <thead><tr><th>Язык</th><th>Название</th><th>Откуда</th><th></th></tr></thead>
+      <tbody>
+        <tr class="group"><th colspan="4">Основные языки приложения</th></tr>
+        ${main.map(langRow).join('')}
+        ${rest.length ? `<tr class="group"><th colspan="4">Дополнительные языки</th></tr>${rest.map(langRow).join('')}` : ''}
+      </tbody>
+    </table>
+    <div class="row" style="margin-top: 12px">
+      <button class="primary" type="button" id="save">${c.saved_at ? 'Сохранить изменения' : 'Сохранить'}</button>
+      ${c.saved_at ? '<button class="danger" type="button" id="delete">Удалить город</button>' : ''}
+      <span class="status" id="save-status">${esc(message)}</span>
+    </div>
+    ${c.saved_at ? `<h3 style="margin-top: 18px">Что получит клиент</h3><pre id="client">${clientJson ? esc(JSON.stringify(clientJson, null, 2)) : '…'}</pre>` : ''}`;
+  if (c.saved_at && !clientJson) {
+    api(`/api/client/${c.geonameid}`).then((j) => { $('#client').textContent = JSON.stringify(j, null, 2); }).catch(() => {});
+  }
+}
+
+card.addEventListener('input', (e) => {
+  const tr = e.target.closest('tr[data-code]');
+  if (!tr) return;
+  const l = current.languages.find((x) => x.code === tr.dataset.code);
+  const changed = e.target.value.trim() !== l.value;
+  tr.querySelector('.src').innerHTML = changed ? '<span class="tag manual">вручную, не сохранено</span>' : sourceTag(l.source, l.review);
+});
+
+card.addEventListener('click', async (e) => {
+  if (e.target.closest('[data-reset]')) {
+    const tr = e.target.closest('tr[data-code]');
+    const l = current.languages.find((x) => x.code === tr.dataset.code);
+    tr.querySelector('input').value = l.suggested.value;
+    tr.querySelector('.src').innerHTML = '<span class="tag manual">предложенное, не сохранено</span>';
+  }
+  if (e.target.id === 'save') {
+    const names = {};
+    for (const tr of card.querySelectorAll('tr[data-code]')) names[tr.dataset.code] = tr.querySelector('input').value;
+    e.target.disabled = true;
+    try {
+      const clientJson = await api('/api/cities', { method: 'POST', body: JSON.stringify({ geonameid: current.geonameid, names }) });
+      current = await api(`/api/place/${current.geonameid}`);
+      renderCard(clientJson, 'Сохранено');
+      loadCities();
+    } catch (err) {
+      $('#save-status').innerHTML = `<span class="error">${esc(err.message)}</span>`;
+      e.target.disabled = false;
+    }
+  }
+  if (e.target.id === 'delete') await deleteCity(current.geonameid, current.name);
+});
+
+// ---- сохранённые города
+async function loadCities() {
+  const list = await api('/api/cities');
+  $('#cities').innerHTML = list.length ? list.map((c) => `
+    <li data-id="${c.geonameid}">
+      <span>${esc(c.label)}${c.review ? ` <span class="tag warn">проверить: ${c.review}</span>` : ''}</span>
+      <button class="icon danger" type="button" data-delete="${c.geonameid}" data-label="${esc(c.label)}" title="Удалить город">×</button>
+    </li>`).join('')
+    : '<li class="muted" style="cursor: default">Пока нет</li>';
+}
+
+async function deleteCity(id, label) {
+  if (!confirm(`Удалить «${label}» из сохранённых городов? Его названия тоже будут удалены.`)) return;
+  try {
+    await api(`/api/cities/${id}`, { method: 'DELETE' });
+    await loadCities();
+    if (current && current.geonameid === id) await openCity(id);  // карточка покажет предложенные названия
+  } catch (err) {
+    alert(err.message);
+  }
+}
+
+$('#cities').addEventListener('click', (e) => {
+  const del = e.target.closest('[data-delete]');
+  if (del) return deleteCity(Number(del.dataset.delete), del.dataset.label);
+  const li = e.target.closest('li[data-id]');
+  if (li) openCity(Number(li.dataset.id));
+});
+
+// ---- языки
+async function loadLanguages() {
+  langs = await api('/api/languages');
+  const label = (code) => `${esc(code)}`;
+  // Самые длинные цепочки без повторов; английский в конце каждой и отдельной строкой ниже
+  $('#chains').innerHTML = langs.chains.map((g) => `
+    <li><b>${g.languages.map(label).join(', ')}</b>${g.tail.slice(0, -1).map((c) => ` → ${label(c)}`).join('')} → <span class="end">${esc(langs.terminal)}</span></li>`).join('');
+  $('#terminal').innerHTML = `<span class="end">${esc(langs.terminal)}</span> ${esc(langName(langs.terminal))} — конечный язык: запасного у него нет, им заканчивается каждая цепочка.`;
+  const all = langs.languages.map((l) => l.code);
+  $('#lang-rows').innerHTML = langs.languages.filter((l) => l.code !== langs.terminal).map((l) => {
+    // нельзя выбрать сам язык и тех, чья цепочка через него проходит: получится цикл
+    const options = langs.languages.filter((o) => o.code !== l.code && !o.chain.includes(l.code))
+      .map((o) => `<option value="${esc(o.code)}" ${o.code === l.fallback ? 'selected' : ''}>${esc(o.code)}</option>`).join('');
+    // Убрать нельзя основной язык и язык, который служит запасным для других
+    const removable = !l.main && !l.used_by.length;
+    const notes = [
+      l.used_by.length ? `запасной для ${l.used_by.join(', ')}` : '',
+      l.geonames_codes.length > 1 ? `в GeoNames ищется как ${l.geonames_codes.join(', ')}` : '',
+    ].filter(Boolean).map((n) => `<div class="muted small">${esc(n)}</div>`).join('');
+    return `<tr>
+      <td>${esc(langName(l.code))} <span class="muted">${esc(l.code)}</span>${l.main ? ' <span class="tag main">основной</span>' : ''}${notes}</td>
+      <td><span class="muted">→</span> <select data-fallback="${esc(l.code)}" aria-label="Запасной язык для ${esc(l.code)}">${options}</select></td>
+      <td>${removable ? `<button class="icon" type="button" data-remove="${esc(l.code)}" title="Убрать язык">×</button>` : ''}</td>
+    </tr>`;
+  }).join('');
+  const chosen = $('#lang-fallback').value || langs.terminal;
+  $('#lang-fallback').innerHTML = all.map((c) => `<option value="${esc(c)}" ${c === chosen ? 'selected' : ''}>${esc(c)}</option>`).join('');
+}
+
+function langStatus(html) {
+  $('#lang-status').innerHTML = html;
+}
+
+$('#lang-rows').addEventListener('change', async (e) => {
+  const code = e.target.dataset.fallback;
+  if (!code) return;
+  try {
+    const r = await api(`/api/languages/${encodeURIComponent(code)}`, { method: 'PATCH', body: JSON.stringify({ fallback: e.target.value }) });
+    langStatus(esc(`Цепочка ${r.chain.join(' → ')}. Пересчитано непроверенных названий: ${r.names_updated}, на проверку: ${r.need_review}.`));
+  } catch (err) {
+    langStatus(`<span class="error">${esc(err.message)}</span>`);
+  }
+  await refreshAfterLanguages();
+});
+
+$('#lang-rows').addEventListener('click', async (e) => {
+  const code = e.target.dataset.remove;
+  if (!code || !confirm(`Убрать язык ${code} из конфига? Его названия у сохранённых городов будут удалены.`)) return;
+  try {
+    const r = await api(`/api/languages/${encodeURIComponent(code)}`, { method: 'DELETE' });
+    langStatus(esc(`Язык ${r.code} убран, удалено названий: ${r.names_removed}.`));
+    await refreshAfterLanguages();
+  } catch (err) {
+    langStatus(`<span class="error">${esc(err.message)}</span>`);
+  }
+});
+
+$('#add-lang').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const code = $('#lang-code').value.trim();
+  if (!code) return;
+  langStatus('Добавляю…');
+  try {
+    const r = await api('/api/languages', { method: 'POST', body: JSON.stringify({ code, fallback: $('#lang-fallback').value }) });
+    langStatus(esc(`Добавлен ${langName(r.code)}: ${r.chain.join(' → ')}. Заполнено у сохранённых городов: ${r.cities_filled}, ` +
+      `на проверку: ${r.need_review}. В GeoNames названия на этом языке есть у ${nf.format(r.places_with_language)} населённых пунктов.`));
+    $('#lang-code').value = '';
+    await refreshAfterLanguages();
+  } catch (err) {
+    langStatus(`<span class="error">${esc(err.message)}</span>`);
+  }
+});
+
+async function refreshAfterLanguages() {
+  await Promise.all([loadLanguages(), loadCities()]);
+  if (current) await openCity(current.geonameid);
+}
+
+api('/api/meta').then((m) => {
+  $('#meta').textContent = `Справочник: ${nf.format(m.places)} населённых пунктов GeoNames, файлы от ${new Date(m.geonames_date).toLocaleDateString('ru-RU')}`;
+}).catch((e) => { $('#meta').textContent = e.message; });
+loadCities();
+loadLanguages().catch((e) => langStatus(`<span class="error">${esc(e.message)}</span>`));
+const linked = Number(new URLSearchParams(location.search).get('city'));
+if (linked) openCity(linked);
+</script>
+</body>
+</html>

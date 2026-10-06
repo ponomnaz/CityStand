@@ -1,0 +1,18 @@
+# Окружение Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+
+# Данные GeoNames и базы стенда: скачиваются и собираются скриптами
+data/
+
+# Логи
+*.log
+
+# Редакторы и система
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db

@@ -1,0 +1,23 @@
+{
+  "languages": [
+    {"code": "ru", "fallback": "en", "main": true},
+    {"code": "en", "main": true},
+    {"code": "de", "fallback": "en", "main": true},
+    {"code": "fr", "fallback": "en", "main": true},
+    {"code": "zh-hans", "fallback": "en", "main": true},
+    {"code": "es", "fallback": "en"},
+    {"code": "it", "fallback": "en"},
+    {"code": "tr", "fallback": "en"},
+    {"code": "hy", "fallback": "en"},
+    {"code": "ka", "fallback": "en"},
+    {"code": "el", "fallback": "en"},
+    {"code": "he", "fallback": "en"},
+    {"code": "ar", "fallback": "en"},
+    {"code": "ja", "fallback": "en"},
+    {"code": "ko", "fallback": "en"},
+    {"code": "th", "fallback": "en"},
+    {"code": "zh-hant", "fallback": "en"},
+    {"code": "kk", "fallback": "ru"},
+    {"code": "be", "fallback": "ru"}
+  ]
+}
